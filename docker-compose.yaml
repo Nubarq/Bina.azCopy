@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  bina_az:
+    image: mysql:8.0
+    container_name: mySQLAlas
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: binaCopy
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12345
+    ports:
+      - "3306:3306"
+    volumes:
+        - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
