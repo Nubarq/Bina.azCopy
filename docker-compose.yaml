@@ -1,18 +1,37 @@
-version: '3.8'
-
 services:
   bina_az:
     image: mysql:8.0
     container_name: mySQLAlas
     environment:
-      MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: binaCopy
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: binaaz
       MYSQL_USER: root
-      MYSQL_PASSWORD: 12345
+      MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "8090:3306"
     volumes:
         - mysql_data:/var/lib/mysql
+    networks:
+      - my_network
+
+  web:
+    image: bina_az_copy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    depends_on:
+      - bina_az
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlLiquibase:3306/binaaz
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - my_network
 
 volumes:
   mysql_data:
+
+networks:
+  my_network:

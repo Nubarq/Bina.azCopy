@@ -1,76 +1,70 @@
 package com.example.demo.config;
 
-import com.alas.lemlist.service.JWTService;
-import com.alas.lemlist.service.UserService;
+import com.example.demo.Repository.TokenRepository;
+import com.example.demo.Service.JWTService;
+import com.example.demo.Service.UserService;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
+
 @Component
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JWTService jwtService;
-    private final UserService userService;
+    JWTService jwtService;
+    UserDetailsService userDetailsService;
+    TokenRepository tokenRepository;
 
     @Override
-    protected void doFilterInternal( @NotNull HttpServletRequest request,
-                                     @NotNull HttpServletResponse response,
-                                     @NotNull FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        final String authHeader= request.getHeader("Authorization");
-        final String jwt;
-        final String useremail;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
+        final String authHeader = request.getHeader("Authorization");
+        final String jwtToken;
+        final String userEmail;
+        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-//        jwt=authHeader.substring(7);
-//        useremail = jwtService.extractUsername(jwt);
+        jwtToken = authHeader.substring(7);
+        userEmail = jwtService.extractUserEmail(jwtToken);
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            boolean isTokenValid = tokenRepository.findByToken(jwtToken)
+                    .map(t -> t.getExpired() == 0 && t.getRevoked() == 0)
+                    .orElse(false);
 
-
-        jwt = authHeader.substring(7);
-
-        try {
-            useremail = jwtService.extractUsername(jwt);
-        } catch (MalformedJwtException e) {
-            logger.error("Malformed JWT: " + jwt, e);
-            filterChain.doFilter(request, response);
-            return;
-        } catch (Exception e) {
-            logger.error("JWT parsing error: " + jwt, e);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
-        if (StringUtils.isNotEmpty(useremail) && SecurityContextHolder.getContext().getAuthentication()==null){
-            UserDetails userDetails = userService.userDetailsService().loadUserByUsername(useremail);
-
-            if (jwtService.isTokenValid(jwt , userDetails)){
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                UsernamePasswordAuthenticationToken token= new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
+            if (jwtService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
                 );
-                token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                securityContext.setAuthentication(token);
-                SecurityContextHolder.setContext(securityContext);
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }
