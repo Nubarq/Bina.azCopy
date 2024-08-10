@@ -1,7 +1,8 @@
 package com.example.demo.config;
 
-import com.alas.lemlist.service.JWTService;
-import com.alas.lemlist.service.UserService;
+
+import com.example.demo.Service.JWTService;
+import com.example.demo.Service.UserService;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

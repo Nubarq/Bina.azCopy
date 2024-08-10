@@ -1,0 +1,30 @@
+logging:
+  level:
+    root: info
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/alasDb
+    username: alas
+    password: alas
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    open-in-view: true
+    show-sql: true
+  data:
+#    redis:
+#      host: 127.0.0.1
+#      port: 6379
+
+
+
+
+url:
+  ignore:
+    swagger: /v2/api-docs, /webjars/*, /swagger-resources/, /actuator/health, /swagger-ui/index.html, /swagger-ui.html, /app//.{js,html}
+
+springdoc:
+  swagger-ui:
+    path: /swagger

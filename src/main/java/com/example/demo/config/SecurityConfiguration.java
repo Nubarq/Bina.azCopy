@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
 
-import com.alas.lemlist.model.Role;
-import com.alas.lemlist.service.UserService;
+import com.example.demo.Service.UserService;
+import com.example.demo.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

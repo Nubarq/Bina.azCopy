@@ -1,18 +1,12 @@
 version: '3.8'
 
 services:
-  bina_az:
-    image: mysql:8.0
-    container_name: mySQLAlas
+  my_bina_app:
+    image: postgres:15
+    container_name: postgresAlasBina
     environment:
-      MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: binaCopy
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 12345
+      POSTGRES_DB: alasDb
+      POSTGRES_USER: alas
+      POSTGRES_PASSWORD: alas
     ports:
-      - "3306:3306"
-    volumes:
-        - mysql_data:/var/lib/mysql
-
-volumes:
-  mysql_data:
+      - "5432:5432"
