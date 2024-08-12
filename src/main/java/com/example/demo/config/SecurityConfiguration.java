@@ -15,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,12 +28,21 @@ public class SecurityConfiguration {
     AuthenticationProvider authenticationProvider;
     LogoutHandler logoutHandler;
 
+    private static final List<String> PERMITTED_PATHS = Arrays.asList(
+            "/api/auth/**",
+            "/main/**",
+            "/data/**",
+            "/login.html",
+            "/register.html",
+            "/css/**"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**", "/main/**").permitAll()
+                        .requestMatchers(PERMITTED_PATHS.toArray(new String[0])).permitAll() // Ensure /main/demo is permitted
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -45,6 +56,7 @@ public class SecurityConfiguration {
                         .logoutSuccessHandler((request, response, authentication) ->
                                 SecurityContextHolder.clearContext())
                 );
+
 
         return http.build();
     }

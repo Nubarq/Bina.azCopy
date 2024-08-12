@@ -11,6 +11,9 @@ spring:
     user:
       name: user
       password: password
+  resources:
+    static:
+      location: classpath:/static/
 
 server:
   port: 8085
