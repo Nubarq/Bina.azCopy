@@ -1,6 +1,5 @@
 package com.example.demo.Service.Impl;
 
-
 import com.example.demo.Dto.AuthenticationRequestDto;
 import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.RegisterRequestDto;
@@ -11,33 +10,39 @@ import com.example.demo.Repository.TokenRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.JWTService;
 import com.example.demo.Service.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cglib.core.Local;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.sound.midi.Soundbank;
-import java.time.LocalDate;
+import org.springframework.mail.javamail.JavaMailSender;
+
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserImpl implements UserService {
 
-    UserRepository userRepository;
-    TokenRepository tokenRepository;
-    PasswordEncoder passwordEncoder;
-    JWTService jwtService;
-    AuthenticationManager authenticationManager;
-    CardRepository cardRepository;
+    final UserRepository userRepository;
+    final TokenRepository tokenRepository;
+    final PasswordEncoder passwordEncoder;
+    final JWTService jwtService;
+    final AuthenticationManager authenticationManager;
+    final CardRepository cardRepository;
+
+    @Autowired
+    JavaMailSender mailSender;
 
     @Override
-    public User register(RegisterRequestDto request) {
+    public User register(RegisterRequestDto request) throws MessagingException {
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
@@ -45,6 +50,17 @@ public class UserImpl implements UserService {
                 .role(Role.USER)
                 .build();
         var savedUser = userRepository.save(user);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+        mimeMessageHelper.setFrom("BinaAz@mail.com");
+        mimeMessageHelper.setTo(user.getEmail());
+        mimeMessageHelper.setSubject("Welcome");
+        mimeMessageHelper.setText("Welcome to Bina.az!");
+
+        mailSender.send(mimeMessage);
 
         return savedUser;
     }

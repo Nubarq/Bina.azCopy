@@ -6,10 +6,11 @@ import com.example.demo.Dto.RegisterRequestDto;
 import com.example.demo.Dto.RequestVIPDto;
 import com.example.demo.Entity.CreditCard;
 import com.example.demo.Entity.User;
+import jakarta.mail.MessagingException;
 
 public interface UserService {
 
-    User register(RegisterRequestDto request);
+    User register(RegisterRequestDto request) throws MessagingException;
 
     User registerVIP(RequestVIPDto request);
 

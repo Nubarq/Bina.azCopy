@@ -6,6 +6,7 @@ import com.example.demo.Dto.RegisterRequestDto;
 import com.example.demo.Dto.RequestVIPDto;
 import com.example.demo.Entity.User;
 import com.example.demo.Service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) {
+    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) throws MessagingException {
         User user = userService.register(request);
         return ResponseEntity.ok(userService.createToken(user));
 
