@@ -4,23 +4,25 @@ package com.example.demo.Service.Impl;
 import com.example.demo.Dto.AuthenticationRequestDto;
 import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.RegisterRequestDto;
-import com.example.demo.Entity.Role;
-import com.example.demo.Entity.Token;
-import com.example.demo.Entity.TokenType;
-import com.example.demo.Entity.User;
+import com.example.demo.Dto.RequestVIPDto;
+import com.example.demo.Entity.*;
+import com.example.demo.Repository.CardRepository;
 import com.example.demo.Repository.TokenRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.JWTService;
 import com.example.demo.Service.UserService;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.sound.midi.Soundbank;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class UserImpl implements UserService {
     PasswordEncoder passwordEncoder;
     JWTService jwtService;
     AuthenticationManager authenticationManager;
+    CardRepository cardRepository;
 
     @Override
     public User register(RegisterRequestDto request) {
@@ -44,6 +47,32 @@ public class UserImpl implements UserService {
         var savedUser = userRepository.save(user);
 
         return savedUser;
+    }
+
+    @Override
+    public User registerVIP(RequestVIPDto request) {
+        var user = User.builder()
+                .user_name(request.getUser_name())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.VIP)
+                .build();
+        var savedUser = userRepository.save(user);
+
+        var creditCard = CreditCard.builder()
+                .cardNumber(request.getCard_number())
+                .expirationDate(request.getExpirationDate())
+                .user(savedUser)
+                .isActive(true)
+                .build();
+        if(creditCard.checkCardIsActive()){
+            cardRepository.save(creditCard);
+
+            return savedUser;
+        }
+        else{
+            return null;
+        }
     }
 
     @Override

@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequestDto {
+public class RequestVIPDto {
 
-    private int id;
     private String user_name;
     private String email;
     private String password;
-
+    private String card_number;
+    private Date expirationDate;
 }

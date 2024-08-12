@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Dto.AuthenticationRequestDto;
 import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.RegisterRequestDto;
+import com.example.demo.Dto.RequestVIPDto;
 import com.example.demo.Entity.User;
 import com.example.demo.Service.UserService;
 import lombok.AccessLevel;
@@ -22,7 +23,17 @@ public class UserController {
 
     UserService userService;
 
-
+    @PostMapping("/api/auth/register/vip")
+    public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) {
+        User user = userService.registerVIP(request);
+        if(user == null){
+            var error = AuthenticationResponseDto.builder()
+                    .error("Credit Card is not valid!")
+                    .build();
+            return ResponseEntity.badRequest().body(error);
+        }
+        return ResponseEntity.ok(userService.createToken(user));
+    }
 
     @PostMapping("/api/auth/register")
     public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) {
