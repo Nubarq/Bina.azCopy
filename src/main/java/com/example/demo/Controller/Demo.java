@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@RequestMapping("/main")
 public class Demo {
 
     //@ResponseBody ---> for sending strings
 
-    @GetMapping("/main/demo")
+    @GetMapping("/demo")
     public String demo() {
         System.out.println("Connected!");
 

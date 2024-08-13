@@ -12,7 +12,7 @@ public interface UserService {
 
     User register(RegisterRequestDto request) throws MessagingException;
 
-    User registerVIP(RequestVIPDto request);
+    User registerVIP(RequestVIPDto request) throws MessagingException;
 
     User login(AuthenticationRequestDto request);
 
@@ -21,4 +21,8 @@ public interface UserService {
     void revokeAllUserTokens(User user);
 
     void savedUserToken(User user, String jwtToken);
+
+    void sendEmail(User user, String subject, String text) throws MessagingException;
+
+    void passwordChange(RegisterRequestDto request, int n) throws MessagingException;
 }

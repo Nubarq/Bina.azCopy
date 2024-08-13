@@ -43,6 +43,8 @@ public class UserImpl implements UserService {
 
     @Override
     public User register(RegisterRequestDto request) throws MessagingException {
+        String verificationText = "Thank you for visiting Bina.az, your trusted platform for property listings and real estate services.";
+        String subject = "Welcome to Bina.az!";
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
@@ -51,22 +53,15 @@ public class UserImpl implements UserService {
                 .build();
         var savedUser = userRepository.save(user);
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
-        mimeMessageHelper.setFrom("BinaAz@mail.com");
-        mimeMessageHelper.setTo(user.getEmail());
-        mimeMessageHelper.setSubject("Welcome");
-        mimeMessageHelper.setText("Welcome to Bina.az!");
-
-        mailSender.send(mimeMessage);
+       sendEmail(savedUser, subject, verificationText);
 
         return savedUser;
     }
 
     @Override
-    public User registerVIP(RequestVIPDto request) {
+    public User registerVIP(RequestVIPDto request) throws MessagingException {
+        String verificationText = "Thank you for visiting Bina.az, your trusted platform for property listings and real estate services.";
+        String subject = "Welcome to Bina.az!";
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
@@ -83,12 +78,44 @@ public class UserImpl implements UserService {
                 .build();
         if(creditCard.checkCardIsActive()){
             cardRepository.save(creditCard);
-
+            sendEmail(savedUser, subject, verificationText);
             return savedUser;
         }
         else{
             return null;
         }
+    }
+
+    @Override
+    public void passwordChange(RegisterRequestDto request, int n) throws MessagingException {
+
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        + "0123456789"
+        + "abcdefghijklmnopqrstuvxyz”";
+
+        StringBuilder s = new StringBuilder(n);
+        int y;
+        for ( y = 0; y < n; y++) {
+            int index
+                    = (int)(AlphaNumericString.length()
+                    * Math.random());
+            s.append(AlphaNumericString
+                    .charAt(index));
+        }
+        String newPassword = s.toString();
+
+        String text = "Your new password is: " + newPassword;
+        String subject = "Password Change";
+
+        String encodedPassword = passwordEncoder.encode(s.toString());
+
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow();
+
+        user.setPassword(encodedPassword);
+        User savedUser = userRepository.save(user);
+
+        sendEmail(savedUser, subject, text);
     }
 
     @Override
@@ -113,6 +140,21 @@ public class UserImpl implements UserService {
         return AuthenticationResponseDto.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    @Override
+    public void sendEmail(User user, String subject, String text) throws MessagingException {
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+        mimeMessageHelper.setFrom("BinaAz@mail.com");
+        mimeMessageHelper.setTo(user.getEmail());
+        mimeMessageHelper.setSubject(subject);
+        mimeMessageHelper.setText(text);
+
+        mailSender.send(mimeMessage);
     }
 
     @Override

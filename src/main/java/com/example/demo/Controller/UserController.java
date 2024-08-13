@@ -18,14 +18,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/auth")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-
 public class UserController {
 
     UserService userService;
 
-    @PostMapping("/api/auth/register/vip")
-    public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) {
+    @PostMapping("/register/vip")
+    public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) throws MessagingException {
         User user = userService.registerVIP(request);
         if(user == null){
             var error = AuthenticationResponseDto.builder()
@@ -36,14 +36,20 @@ public class UserController {
         return ResponseEntity.ok(userService.createToken(user));
     }
 
-    @PostMapping("/api/auth/register")
+    @PostMapping("/password/change")
+    public String passwordChange(@RequestBody RegisterRequestDto request) throws MessagingException {
+        userService.passwordChange(request, 6);
+        return "Password changed. Check your email!";
+    }
+
+    @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) throws MessagingException {
         User user = userService.register(request);
         return ResponseEntity.ok(userService.createToken(user));
 
     }
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDto> login(@RequestBody AuthenticationRequestDto request) {
         User user = userService.login(request);
         return ResponseEntity.ok(userService.createToken(user));
