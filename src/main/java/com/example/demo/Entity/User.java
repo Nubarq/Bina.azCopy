@@ -30,6 +30,12 @@ public class User implements UserDetails, Serializable {
     @Column(name = "user_name")
     private String user_name;
 
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "is_verified")
+    boolean isVerified;
+
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "Email must be valid.Example: firstname-lastname@example.com  ")
     @Column(name = "email")
     private String email;

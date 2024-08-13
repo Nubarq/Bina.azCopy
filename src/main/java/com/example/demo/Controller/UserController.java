@@ -5,6 +5,7 @@ import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.RegisterRequestDto;
 import com.example.demo.Dto.RequestVIPDto;
 import com.example.demo.Entity.User;
+import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
@@ -23,6 +24,22 @@ import org.springframework.web.servlet.ModelAndView;
 public class UserController {
 
     UserService userService;
+    UserRepository userRepository;
+
+    @GetMapping("/verification")
+    public ResponseEntity<String> verifyUser(@RequestParam("token") String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
+
+        if (user.isVerified()) {
+            return ResponseEntity.badRequest().body("User is already verified.");
+        }
+
+        user.setVerified(true);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User verified successfully!");
+    }
 
     @PostMapping("/register/vip")
     public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) throws MessagingException {
@@ -36,12 +53,6 @@ public class UserController {
         return ResponseEntity.ok(userService.createToken(user));
     }
 
-    @PostMapping("/password/change")
-    public String passwordChange(@RequestBody RegisterRequestDto request) throws MessagingException {
-        userService.passwordChange(request, 6);
-        return "Password changed. Check your email!";
-    }
-
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) throws MessagingException {
         User user = userService.register(request);
@@ -53,5 +64,11 @@ public class UserController {
     public ResponseEntity<AuthenticationResponseDto> login(@RequestBody AuthenticationRequestDto request) {
         User user = userService.login(request);
         return ResponseEntity.ok(userService.createToken(user));
+    }
+
+    @PostMapping("/password/change")
+    public String passwordChange(@RequestBody RegisterRequestDto request) throws MessagingException {
+        userService.passwordChange(request, 6);
+        return "Password changed. Check your email!";
     }
 }

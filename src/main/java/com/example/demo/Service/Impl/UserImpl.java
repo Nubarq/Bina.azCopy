@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -43,15 +45,28 @@ public class UserImpl implements UserService {
 
     @Override
     public User register(RegisterRequestDto request) throws MessagingException {
-        String verificationText = "Thank you for visiting Bina.az, your trusted platform for property listings and real estate services.";
-        String subject = "Welcome to Bina.az!";
+        String token = UUID.randomUUID().toString();
+
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .verificationToken(token)
+                .isVerified(false)
                 .build();
         var savedUser = userRepository.save(user);
+
+        String link = "http://localhost:8085/api/auth/verification?token=" + token;
+        String verificationText = "<html>"
+                + "<body>"
+                + "<p>Thank you for visiting <strong>Bina.az</strong>, your trusted platform for property listings and real estate services.</p>"
+                + "<p>Please click the link below to verify your account:</p>"
+                + "<p><a href=\"" + link + "\">Verify your account</a></p>"
+                + "</body>"
+                + "</html>";
+
+        String subject = "Welcome to Bina.az!";
 
        sendEmail(savedUser, subject, verificationText);
 
@@ -60,8 +75,7 @@ public class UserImpl implements UserService {
 
     @Override
     public User registerVIP(RequestVIPDto request) throws MessagingException {
-        String verificationText = "Thank you for visiting Bina.az, your trusted platform for property listings and real estate services.";
-        String subject = "Welcome to Bina.az!";
+        String token = UUID.randomUUID().toString();
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
@@ -78,6 +92,18 @@ public class UserImpl implements UserService {
                 .build();
         if(creditCard.checkCardIsActive()){
             cardRepository.save(creditCard);
+
+            String link = "http://localhost:8085/api/auth/verification?token=" + token;
+            String verificationText = "<html>"
+                    + "<body>"
+                    + "<p>Thank you for visiting <strong>Bina.az</strong>, your trusted platform for property listings and real estate services.</p>"
+                    + "<p>Please click the link below to verify your account:</p>"
+                    + "<p><a href=\"" + link + "\">Verify your account</a></p>"
+                    + "</body>"
+                    + "</html>";
+
+            String subject = "Welcome to Bina.az!";
+
             sendEmail(savedUser, subject, verificationText);
             return savedUser;
         }
@@ -152,7 +178,7 @@ public class UserImpl implements UserService {
         mimeMessageHelper.setFrom("BinaAz@mail.com");
         mimeMessageHelper.setTo(user.getEmail());
         mimeMessageHelper.setSubject(subject);
-        mimeMessageHelper.setText(text);
+        mimeMessageHelper.setText(text, true);
 
         mailSender.send(mimeMessage);
     }
