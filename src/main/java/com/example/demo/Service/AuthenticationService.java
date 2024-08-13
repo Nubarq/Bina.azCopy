@@ -9,4 +9,6 @@ public interface AuthenticationService {
 
      JwtAuthenticationResponse signin(SigninRequest signinRequest);
      JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest)throws Exception;
+
+     void forgotPassword(String email);
 }

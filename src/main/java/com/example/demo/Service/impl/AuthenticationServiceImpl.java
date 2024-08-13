@@ -14,13 +14,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-//import com.mailersend.sdk.Email;
-//import com.mailersend.sdk.MailerSend;
-//import com.mailersend.sdk.MailerSendResponse;
-//import com.mailersend.sdk.exceptions.MailerSendException;
-//import org.springframework.mail.javamail.JavaMailSender;
+import java.security.SecureRandom;
 import java.util.HashMap;
 
 @Service
@@ -40,12 +37,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
+    private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int MIN_LENGTH = 5;
+    private static final int MAX_LENGTH = 12;
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private String generatedPassword;
+
 
 
 
     public void sendEmail(String to, String subject, String message) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("BinaCopy@gmail.com");
+        simpleMailMessage.setFrom("nubarqasimova05@gmail.com");
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setTo(to);
         simpleMailMessage.setText(message);
@@ -93,6 +96,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setEmail(signUpVIP.getEmail());
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(signUpVIP.getPassword()));
+        sendEmail(signUpVIP.getEmail(),"welcome","welcome to Bina.az");
+
         User savedUser= userRepository.save(user);
         var jwt = jwtService.generateToken(savedUser);
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), savedUser);
@@ -129,4 +134,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return null;
     }
+
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email);
+
+        int length = MIN_LENGTH + RANDOM.nextInt(MAX_LENGTH - MIN_LENGTH + 1);
+        StringBuilder password = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = RANDOM.nextInt(ALPHANUMERIC.length());
+            password.append(ALPHANUMERIC.charAt(index));
+        }
+        this.generatedPassword = password.toString();
+
+        // Encode the password before saving it
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(this.generatedPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        // Send email with the new password
+        sendEmail(email, "Password Reset", "Your new password is: " + this.generatedPassword);
+
+    }
+    public String getGeneratedPassword() {
+        return generatedPassword;
+    }
+
 }

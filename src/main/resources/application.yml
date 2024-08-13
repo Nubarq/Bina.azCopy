@@ -17,9 +17,9 @@ spring:
 
 
   mail:
-    host: sandbox.smtp.mailtrap.io
-    username: e1b7e006fa41ee
-    password: 7a9560a3f7ea2f
+    host: smtp.gmail.com
+    username: "nubarqasimova05@gmail.com"
+    password: "Bar130805"
     port: 587
     properties:
       mail:

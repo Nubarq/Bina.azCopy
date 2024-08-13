@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.Service.impl.AuthenticationServiceImpl;
 import com.example.demo.dto.JwtAuthenticationResponse;
 import com.example.demo.dto.SignUpRequest;
+import com.example.demo.dto.SignUpVIP;
+import com.example.demo.dto.SigninRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,4 +24,20 @@ public class AuthController {
         return service.signup(signUpRequest);
     }
 
-}
+    @PostMapping("/registerVIP")
+    public JwtAuthenticationResponse signupVIP(@RequestBody SignUpVIP signUpVIP) {
+        return service.signupVIP(signUpVIP);
+    }
+
+    @PostMapping("/signin")
+    public JwtAuthenticationResponse signin(@RequestBody SigninRequest signinRequest) {
+        return service.signin(signinRequest);
+    }
+
+    @PostMapping("/forgotPassword")
+    public void forgotPassword(String email) {
+        service.forgotPassword(email);
+    }
+
+
+    }
