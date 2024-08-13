@@ -16,7 +16,6 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "user")
-//public class User implements UserDetails {
 public class User implements UserDetails {
 
     @Id
@@ -33,12 +32,15 @@ public class User implements UserDetails {
 
 
     @Email(message = "Email should be valid")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "Email must be valid.Example: firstname-lastname@example.com  ")
     @NotNull(message = "Email cannot be null")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "Email must be valid.Example: firstname-lastname@example.com  ")
     @Column(name = "email")
     private String email;
 
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Card card;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,12 +1,67 @@
 version: '3.8'
 
+
 services:
-  my_bina_app:
-    image: postgres:15
-    container_name: postgresAlasBina
+  my_bina_mysql:
+    image: mysql:8.0
+    container_name: binaMysql
     environment:
-      POSTGRES_DB: alasDb
-      POSTGRES_USER: alas
-      POSTGRES_PASSWORD: alas
+      MYSQL_ROOT_PASSWORD: bina
+      MYSQL_DATABASE: binaDb
+      MYSQL_USER: bina
+      MYSQL_PASSWORD: bina
     ports:
-      - "5432:5432"
+      - "8895:3306"
+
+
+
+
+
+#services:
+#  my_bina_app:
+#    image: postgres:15
+#    container_name: postgresAlasBina
+#    environment:
+#      POSTGRES_DB: alasDb
+#      POSTGRES_USER: alas
+#      POSTGRES_PASSWORD: alas
+##    ports:
+##      - "5432:5432"
+#
+#services:
+#  bina_az:
+#    image: mysql:8.0
+#    container_name: mySQLAlas
+#    environment:
+#      MYSQL_ROOT_PASSWORD: password
+#      MYSQL_DATABASE: binaaz
+#      MYSQL_USER: root
+#      MYSQL_PASSWORD: password
+#    ports:
+#      - "8090:3306"
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    networks:
+#      - my_network
+#
+#  web:
+#    image: bina_az_copy
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8085:8085"
+#    depends_on:
+#      - bina_az
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysqlLiquibase:3306/binaaz
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: password
+#    networks:
+#      - my_network
+#
+#volumes:
+#  mysql_data:
+#
+#networks:
+#  my_network:

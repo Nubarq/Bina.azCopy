@@ -1,22 +1,33 @@
 logging:
   level:
     root: info
+
 spring:
+
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/alasDb
-    username: alas
-    password: alas
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/lemlistapp
+    username: root
+    password: 12345
   jpa:
     hibernate:
       ddl-auto: update
-    database: postgresql
-    open-in-view: true
-    show-sql: true
-  data:
-#    redis:
-#      host: 127.0.0.1
-#      port: 6379
+
+    database: mysql
+
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    username: e1b7e006fa41ee
+    password: 7a9560a3f7ea2f
+    port: 587
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
 
 
 

@@ -35,18 +35,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/**")
                         .permitAll()
                         .requestMatchers("/api/v1/admin").hasAnyAuthority(Role.ADMIN.name())
-                        .requestMatchers("/api/v1/user").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/api/v1/files").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/api/v1/files/delete").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/api/v1/files/details").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/api/v1/files/videoResource").hasAnyAuthority(Role.USER.name())
-
-                        .requestMatchers("/api/v1/widget/code").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/api/v1/widget/videos").hasAnyAuthority(Role.USER.name())
-
-                        .requestMatchers("/api/v1/video").hasAnyAuthority(Role.USER.name())
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()                        .anyRequest().authenticated())
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
