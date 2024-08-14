@@ -46,7 +46,6 @@ public class UserImpl implements UserService {
     @Override
     public User register(RegisterRequestDto request) throws MessagingException {
         String token = UUID.randomUUID().toString();
-
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())

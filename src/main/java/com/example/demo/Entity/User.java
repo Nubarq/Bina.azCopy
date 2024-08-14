@@ -25,7 +25,7 @@ public class User implements UserDetails, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Integer user_id;
+    private int user_id;
 
     @Column(name = "user_name")
     private String user_name;
@@ -46,9 +46,16 @@ public class User implements UserDetails, Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "number_of_ads")
+    private Integer numberOfAds;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Property> properties;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
