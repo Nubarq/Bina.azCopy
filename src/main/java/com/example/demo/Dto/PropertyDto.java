@@ -24,5 +24,5 @@ public class PropertyDto {
     private String image;
     private LocalDate expiration_date;
     private int construction_year;
-    private int square_meter_area;
+    private int area;
 }

@@ -1,5 +1,6 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.PropertyDto;
 import com.example.demo.Entity.Property;
 import com.example.demo.Entity.User;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/property")
+@RequestMapping("/api/auth/user")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class PropertyController {
 
@@ -23,16 +24,17 @@ public class PropertyController {
     PropertyRepository propertyRepository;
 
 
-    @PostMapping("/{user_id}/add")
-    public ResponseEntity<Property> addProperty(@PathVariable("user_id") int user_id, @RequestBody PropertyDto request){
-        Property property = propertyService.addProperty(request);
+    @PostMapping("/{user_id}/add/properties")
+    public ResponseEntity<String> addProperty(@PathVariable("user_id") int user_id, @RequestBody PropertyDto request){
+       return ResponseEntity.ok(propertyService.addProperty(request, user_id));
+    }
 
-        User user = userRepository.findById(user_id)
-                .orElse(null);
-        property.setUser(user);
-        Property savedProperty = propertyRepository.save(property);
+    @DeleteMapping("/delete/properties/{property_id}")
+    public ResponseEntity<String> deleteProperty(@PathVariable("property_id") int property_id ){
 
-        return ResponseEntity.ok(savedProperty);
+        propertyService.deleteProperty(property_id);
+
+        return ResponseEntity.ok("Propert with the ID: " + property_id + " was deleted.");
     }
 
 }

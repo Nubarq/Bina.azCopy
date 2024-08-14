@@ -21,7 +21,7 @@ public class Property {
     @Id
     @GeneratedValue
     @Column(name = "property_id")
-    private long propertyId;
+    private int propertyId;
 
     @Column(name = "price")
     private double price;
@@ -56,8 +56,11 @@ public class Property {
     @Column(name = "construction_year")
     private int construction_year;
 
-    @Column(name = "square_meter_area")
-    private int square_meter_area;
+    @Column(name = "area")
+    private int area;
+
+    @Column(name = "isActive")
+    private boolean is_active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

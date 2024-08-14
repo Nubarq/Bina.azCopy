@@ -36,6 +36,9 @@ public class User implements UserDetails, Serializable {
     @Column(name = "is_verified")
     boolean isVerified;
 
+    @Column(name = "property_count")
+    private int property_count;
+
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "Email must be valid.Example: firstname-lastname@example.com  ")
     @Column(name = "email")
     private String email;
@@ -45,9 +48,6 @@ public class User implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Column(name = "number_of_ads")
-    private Integer numberOfAds;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference

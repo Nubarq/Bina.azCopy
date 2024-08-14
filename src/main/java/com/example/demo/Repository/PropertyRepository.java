@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface PropertyRepository extends JpaRepository<Property,Long> {
+public interface PropertyRepository extends JpaRepository<Property,Integer> {
 
-    Optional<Property> findByPropertyId(long propertyId);
+    Optional<Property> findByPropertyId(int propertyId);
 }

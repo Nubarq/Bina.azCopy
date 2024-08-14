@@ -5,5 +5,7 @@ import com.example.demo.Entity.Property;
 
 public interface PropertyService {
 
-    Property addProperty(PropertyDto request);
+    String addProperty(PropertyDto request, int user_id);
+
+    void deleteProperty(int property_id);
 }

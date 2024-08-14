@@ -4,6 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum BuildingType {
-    VILLA,
+    HOUSE,
     APARTMENT
 }

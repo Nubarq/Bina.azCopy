@@ -51,6 +51,7 @@ public class UserImpl implements UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .property_count(0)
                 .verificationToken(token)
                 .isVerified(false)
                 .build();
@@ -78,6 +79,7 @@ public class UserImpl implements UserService {
         var user = User.builder()
                 .user_name(request.getUser_name())
                 .email(request.getEmail())
+                .property_count(0)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.VIP)
                 .build();
