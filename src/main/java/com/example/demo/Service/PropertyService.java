@@ -7,5 +7,7 @@ public interface PropertyService {
 
     String addProperty(PropertyDto request, int user_id);
 
-    void deleteProperty(int property_id);
+    void deleteProperty(int property_id, int user_id);
+
+    Property updateProperty(int property_id, PropertyDto request);
 }

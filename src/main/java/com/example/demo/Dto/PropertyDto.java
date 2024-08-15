@@ -22,7 +22,6 @@ public class PropertyDto {
     private int floor_number;
     private int total_floors;
     private String image;
-    private LocalDate expiration_date;
     private int construction_year;
     private int area;
 }

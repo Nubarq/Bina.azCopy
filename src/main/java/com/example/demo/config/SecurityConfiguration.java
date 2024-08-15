@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.Component.JwtAuthenticationFilter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

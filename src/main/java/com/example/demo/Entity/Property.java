@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Builder
@@ -19,7 +17,7 @@ import java.util.List;
 @Table(name = "property")
 public class Property {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "property_id")
     private int propertyId;
 
@@ -51,7 +49,7 @@ public class Property {
     private LocalDate added_date;
 
     @Column(name = "expiration_date")
-    private LocalDate expiration_date;
+    private LocalDate expirationDate;
 
     @Column(name = "construction_year")
     private int construction_year;
