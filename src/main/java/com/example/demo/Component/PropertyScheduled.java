@@ -18,18 +18,7 @@ public class PropertyScheduled {
 
     private final PropertyRepository propertyRepository;
 
-    @Scheduled(cron = "0 0 0 * * MON") // Run every week. This cron expression corresponds to once a week at midnight on Monday.
-    public void removeExpiredPropertiesScheduled() {
-        deactivateExpiredProperties();
-    }
-
-    // Run on application startup
-    @EventListener(ContextRefreshedEvent.class)
-    public void removeExpiredPropertiesOnStartup() {
-        log.info("App start up");
-        deactivateExpiredProperties();
-    }
-
+    @Scheduled(cron = "0 0 0 * * *")
     public void deactivateExpiredProperties(){
         LocalDate today = LocalDate.now();
         try {

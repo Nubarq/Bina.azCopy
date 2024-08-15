@@ -11,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
@@ -69,7 +72,7 @@ public class PropertyImpl implements PropertyService {
     public void deleteProperty(int property_id, int user_id) {
         User propertUser = userRepository.findById(user_id)
                 .orElse(null);
-        if(propertUser != null){
+        if(propertUser != null && propertUser.getProperty_count() > 0){
             int newCount = propertUser.getProperty_count() - 1;
             propertUser.setProperty_count(newCount);
             userRepository.save(propertUser);
@@ -90,6 +93,14 @@ public class PropertyImpl implements PropertyService {
         return null;
     }
 
+    @Override
+    public Page<Property> getProperties(int page, int size) {
+        int maxSize = 20;
+        if(size > maxSize)
+            size = maxSize;
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findAll(pageable);
+    }
 
 
 }

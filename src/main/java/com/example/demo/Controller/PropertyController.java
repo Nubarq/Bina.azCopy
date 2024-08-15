@@ -1,11 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Dto.AuthenticationResponseDto;
 import com.example.demo.Dto.PropertyDto;
-import com.example.demo.Entity.Property;
-import com.example.demo.Entity.User;
-import com.example.demo.Repository.PropertyRepository;
-import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.PropertyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
