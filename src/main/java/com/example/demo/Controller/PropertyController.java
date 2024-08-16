@@ -22,23 +22,23 @@ public class PropertyController {
        return ResponseEntity.ok(propertyService.addProperty(request, user_id));
     }
 
-    @DeleteMapping("/{user_id}/delete/properties/{property_id}")
+    @DeleteMapping("/delete/properties/{property_id}")
     public ResponseEntity<String> deleteProperty(@PathVariable("property_id") int property_id, @PathVariable("user_id") int user_id){
-        propertyService.deleteProperty(property_id, user_id);
+        propertyService.deleteProperty(property_id);
 
-        return ResponseEntity.ok("Propert with the ID: " + property_id + " was deleted.");
+        return ResponseEntity.ok("Propert with the ID: {} was deleted." + property_id);
     }
 
-    @PostMapping("/{user_id}/update/properties/{property_id}")
+    @PostMapping("/update/properties/{property_id}")
     public ResponseEntity<String> updateProperty(@PathVariable("property_id") int property_id, @RequestBody PropertyDto request){
         if(request == null){
             return ResponseEntity.badRequest().body("No changes made");
         }
         var property = propertyService.updateProperty(property_id, request);
         if(property != null){
-            return ResponseEntity.ok("Propert with the ID: " + property_id + " was updated.");
+            return ResponseEntity.ok("Propert with the ID: {} was updated." + property_id );
         }
-        return ResponseEntity.badRequest().body("Propert with the ID: " + property_id + " was not found.");
+        return ResponseEntity.badRequest().body("Propert with the ID: {} was not found" + property_id);
 
     }
 

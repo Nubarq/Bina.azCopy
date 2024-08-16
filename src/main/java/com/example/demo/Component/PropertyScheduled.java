@@ -4,8 +4,6 @@ import com.example.demo.Entity.Property;
 import com.example.demo.Repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
@@ -18,17 +16,21 @@ public class PropertyScheduled {
 
     private final PropertyRepository propertyRepository;
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void deactivateExpiredProperties(){
+    @Scheduled(cron = "0 0 0 * * *")//@Scheduled(cron = "0 0 0 * * *")
+    public void deactivateExpiredProperties() {
         LocalDate today = LocalDate.now();
+
         try {
             List<Property> listProperties = propertyRepository.findByExpirationDateBefore(today);
 
-            for (Property property : listProperties) {
-                property.set_active(false);
-            }
 
-            log.info("Expired properties removed successfully.");
+            if (listProperties != null && !listProperties.isEmpty()) {
+                for (Property property : listProperties) {
+                    property.set_active(false);
+                    log.info("Expired properties removed successfully with ID: {}", property.getPropertyId());
+                    propertyRepository.save(property);
+                }
+            }
         } catch (Exception e) {
             log.error("Error occurred while removing expired properties: ", e);
         }

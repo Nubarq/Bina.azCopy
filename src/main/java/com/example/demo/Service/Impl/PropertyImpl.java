@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.View;
+
 import java.time.LocalDate;
 
 @Service
@@ -25,6 +27,7 @@ public class PropertyImpl implements PropertyService {
     PropertyRepository propertyRepository;
     UserRepository userRepository;
     ModelMapper modelMapper;
+    private final View error;
 
 
     @Override
@@ -69,15 +72,19 @@ public class PropertyImpl implements PropertyService {
     }
 
     @Override
-    public void deleteProperty(int property_id, int user_id) {
-        User propertUser = userRepository.findById(user_id)
+    public void deleteProperty(int property_id) {
+        Property property = propertyRepository.findById(property_id)
                 .orElse(null);
-        if(propertUser != null && propertUser.getProperty_count() > 0){
-            int newCount = propertUser.getProperty_count() - 1;
-            propertUser.setProperty_count(newCount);
-            userRepository.save(propertUser);
+        if(property != null){
+            User propertUser = property.getUser();
+            if(propertUser != null && propertUser.getProperty_count() > 0){
+                int newCount = propertUser.getProperty_count() - 1;
+                propertUser.setProperty_count(newCount);
+                userRepository.save(propertUser);
+                propertyRepository.deleteById(property_id);
+            }
         }
-        propertyRepository.deleteById(property_id);
+
     }
 
     @Override
@@ -85,7 +92,7 @@ public class PropertyImpl implements PropertyService {
         Property property = propertyRepository.findByPropertyId(property_id)
                 .orElse(null);
 
-        if(property != null){
+        if(property != null && property.is_active()){
             modelMapper.map(request, property);
 
             return propertyRepository.save(property);
