@@ -10,7 +10,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -38,9 +40,27 @@ public class User implements UserDetails {
     private String email;
 
     private Role role;
+    private UserType userType;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Card card;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "is_verified")
+    boolean isVerified;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Property> propertyList;
+
+    public User() {
+        // Create a new Account with default values and set bidirectional relationship
+        this.propertyList = new ArrayList<>(); // Initialize loans list in the constructor
+
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

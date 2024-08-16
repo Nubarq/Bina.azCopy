@@ -6,12 +6,17 @@ import com.example.demo.dto.*;
 import com.example.demo.model.Card;
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
+import com.example.demo.model.UserType;
+import com.example.demo.repository.CardRepository;
 import com.example.demo.repository.UserRepository;
 //import com.mailersend.sdk.Recipient;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,24 +24,26 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.UUID;
 
 @Service
 //@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
+    private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
     private final JavaMailSender mailSender;
     @Autowired
     private final AuthenticationManager authenticationManager;
-    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, JavaMailSender mailSender, AuthenticationManager authenticationManager){
+    public AuthenticationServiceImpl(CardRepository cardRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, JWTService jwtService, JavaMailSender mailSender, AuthenticationManager authenticationManager){
+        this.cardRepository = cardRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mailSender=mailSender;
         this.authenticationManager = authenticationManager;
     }
-
     private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int MIN_LENGTH = 5;
     private static final int MAX_LENGTH = 12;
@@ -44,34 +51,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String generatedPassword;
 
 
+    public void sendEmail(String to, String subject, String message) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        mimeMessageHelper.setFrom("Arzuyaldiz47@outlook.com");
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setSubject(subject);
+        mimeMessageHelper.setText(message, true);
 
-
-    public void sendEmail(String to, String subject, String message) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("nubarqasimova05@gmail.com");
-        simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setTo(to);
-        simpleMailMessage.setText(message);
-        this.mailSender.send(simpleMailMessage);
+        mailSender.send(mimeMessage);
 
     }
 
 
-
-
     @Override
-    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest) {
+    public JwtAuthenticationResponse signup(SignUpRequest signUpRequest) throws MessagingException {
+        String token = UUID.randomUUID().toString();
+
         User user = new User();
         System.out.println("The password is: => "+signUpRequest.getPassword());
 
         user.setEmail(signUpRequest.getEmail());
         user.setRole(Role.USER);
+        user.setUserType(UserType.NORMAL);
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
-
-
-        sendEmail(signUpRequest.getEmail(),"welcome","welcome to Bina.az");
+        user.setVerificationToken(token);
         User savedUser= userRepository.save(user);
+
+        String link = "http://localhost:8080/api/v1/auth/verification?token=" + token;
+        String verificationText = "<html>"
+                + "<body>"
+                + "<p>Thank you for visiting <strong>Bina.az</strong>, your trusted platform for property listings and real estate services.</p>"
+                + "<p>Please click the link below to verify your account:</p>"
+                + "<p><a href=\"" + link + "\">Verify your account</a></p>"
+                + "</body>"
+                + "</html>";
+
+        String subject = "Welcome to Bina.az!";
+
+        sendEmail(savedUser.getEmail(), subject, verificationText);
+
+
+
         var jwt = jwtService.generateToken(savedUser);
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), savedUser);
         JwtAuthenticationResponse jwtAuthenticationResponse=new JwtAuthenticationResponse();
@@ -84,27 +105,44 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public JwtAuthenticationResponse signupVIP(SignUpVIP signUpVIP) {
+    public JwtAuthenticationResponse signupVIP(SignUpVIP signUpVIP) throws MessagingException {
+        String token = UUID.randomUUID().toString();
+
+
         User user = new User();
+        user.setEmail(signUpVIP.getEmail());
+        user.setRole(Role.USER);
+        user.setUserType(UserType.VIP);
+        user.setPassword(passwordEncoder.encode(signUpVIP.getPassword()));
+        User savedUser= userRepository.save(user);
+
         Card card = new Card();
         card.setCardNumber(signUpVIP.getCardNumber());
         card.setExpirationDate(signUpVIP.getExpirationDate());
-        card.checkCardIsActive();
+        card.setUser(savedUser);
+        if (card.checkCardIsActive()){
+             cardRepository.save(card);
 
+            String link = "http://localhost:8080/api/v1/auth/verification?token=" + token;
+            String verificationText = "<html>"
+                    + "<body>"
+                    + "<p>Thank you for visiting <strong>Bina.az</strong>, your trusted platform for property listings and real estate services.</p>"
+                    + "<p>Please click the link below to verify your account:</p>"
+                    + "<p><a href=\"" + link + "\">Verify your account</a></p>"
+                    + "</body>"
+                    + "</html>";
+            String subject = "Welcome to Bina.az!";
 
-        user.setCard(card);
-        user.setEmail(signUpVIP.getEmail());
-        user.setRole(Role.USER);
-        user.setPassword(passwordEncoder.encode(signUpVIP.getPassword()));
-        sendEmail(signUpVIP.getEmail(),"welcome","welcome to Bina.az");
+            sendEmail(savedUser.getEmail(), subject, verificationText);
 
-        User savedUser= userRepository.save(user);
-        var jwt = jwtService.generateToken(savedUser);
-        var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), savedUser);
-        JwtAuthenticationResponse jwtAuthenticationResponse=new JwtAuthenticationResponse();
-        jwtAuthenticationResponse.setToken(jwt);
-        jwtAuthenticationResponse.setRefreshToken(refreshToken);
-        return jwtAuthenticationResponse;
+            var jwt = jwtService.generateToken(savedUser);
+            var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), savedUser);
+            JwtAuthenticationResponse jwtAuthenticationResponse=new JwtAuthenticationResponse();
+            jwtAuthenticationResponse.setToken(jwt);
+            jwtAuthenticationResponse.setRefreshToken(refreshToken);
+            return jwtAuthenticationResponse;
+        }
+        return null;
     }
 
 
@@ -136,7 +174,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void forgotPassword(String email) {
+    public void forgotPassword(String email) throws MessagingException {
         User user = userRepository.findByEmail(email);
 
         int length = MIN_LENGTH + RANDOM.nextInt(MAX_LENGTH - MIN_LENGTH + 1);

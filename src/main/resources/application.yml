@@ -6,9 +6,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/lemlistapp
-    username: root
-    password: 12345
+    url: jdbc:mysql://localhost:8895/binaDb
+    username: bina
+    password: bina
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,9 +17,12 @@ spring:
 
 
   mail:
-    host: smtp.gmail.com
-    username: "nubarqasimova05@gmail.com"
-    password: "Bar130805"
+#    host: sandbox.smtp.mailtrap.io
+#    username: "e1b7e006fa41ee"
+#    password: "7a9560a3f7ea2f"
+    host: smtp.outlook.com
+    username: "Arzuyaldiz47@outlook.com"
+    password: "6989Ay45"
     port: 587
     properties:
       mail:
