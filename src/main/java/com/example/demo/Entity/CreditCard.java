@@ -17,6 +17,7 @@ import java.util.UUID;
 public class CreditCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(unique = true)
@@ -26,7 +27,7 @@ public class CreditCard {
     private Date expirationDate;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id_credit")
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

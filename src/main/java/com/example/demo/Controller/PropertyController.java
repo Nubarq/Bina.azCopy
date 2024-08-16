@@ -1,6 +1,10 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Dto.PropertyDto;
+import com.example.demo.Entity.Property;
+import com.example.demo.Entity.Role;
+import com.example.demo.Entity.User;
+import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.PropertyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +19,22 @@ import org.springframework.web.bind.annotation.*;
 public class PropertyController {
 
     PropertyService propertyService;
-
+    UserRepository userRepository;
 
     @PostMapping("/{user_id}/add/properties")
     public ResponseEntity<String> addProperty(@PathVariable("user_id") int user_id, @RequestBody PropertyDto request){
-       return ResponseEntity.ok(propertyService.addProperty(request, user_id));
+        User user = userRepository.findById(user_id)
+                .orElse(null);
+        if(user != null) {
+            if (user.getRole() == Role.VIP || (user.getRole() == Role.USER && user.getProperty_count() < 5)) {
+                Property property = propertyService.addProperty(request, user);
+                return ResponseEntity.ok("Property added successfully with the ID: {} " + property.getPropertyId());
+            }
+            else{
+                return ResponseEntity.badRequest().body("You are only allowed to add 5 property. You need a VIP account to do this if you want proceed");
+            }
+        }
+        return ResponseEntity.badRequest().body("User not found!");
     }
 
     @DeleteMapping("/delete/properties/{property_id}")
@@ -34,9 +49,14 @@ public class PropertyController {
         if(request == null){
             return ResponseEntity.badRequest().body("No changes made");
         }
+
         var property = propertyService.updateProperty(property_id, request);
-        if(property != null){
+        User user= property.getUser();
+        if(property != null && user.getProperty_count() <= 5){
             return ResponseEntity.ok("Propert with the ID: {} was updated." + property_id );
+        }
+        else if(user.getProperty_count() > 5){
+            return ResponseEntity.badRequest().body("You are only allowed to add 5 property. You need a VIP account to do this if you want proceed");
         }
         return ResponseEntity.badRequest().body("Propert with the ID: {} was not found" + property_id);
 

@@ -2,11 +2,12 @@ package com.example.demo.Service;
 
 import com.example.demo.Dto.PropertyDto;
 import com.example.demo.Entity.Property;
+import com.example.demo.Entity.User;
 import org.springframework.data.domain.Page;
 
 public interface PropertyService {
 
-    String addProperty(PropertyDto request, int user_id);
+    Property addProperty(PropertyDto request, User user);
 
     void deleteProperty(int property_id);
 

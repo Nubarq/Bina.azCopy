@@ -27,48 +27,32 @@ public class PropertyImpl implements PropertyService {
     PropertyRepository propertyRepository;
     UserRepository userRepository;
     ModelMapper modelMapper;
-    private final View error;
-
 
     @Override
-    public String addProperty(PropertyDto request, int user_id) {
+    public Property addProperty(PropertyDto request, User user) {
+        LocalDate date = LocalDate.now();
+        LocalDate expirationDate = date.plusDays(7);
+        var property = Property.builder()
+                .is_active(true)
+                .price(request.getPrice())
+                .address(request.getAddress())
+                .added_date(date)
+                .expirationDate(expirationDate)
+                .buildingType(request.getBuilding_type())
+                .floor_number(request.getFloor_number())
+                .total_floors(request.getTotal_floors())
+                .room_count(request.getRoom_count())
+                .area(request.getArea())
+                .sale_type(request.getSale_type())
+                .construction_year(request.getConstruction_year())
+                .image(request.getImage())
+                .user(user)
+                .build();
+        propertyRepository.save(property);
+        user.setProperty_count(user.getProperty_count() + 1);
+        userRepository.save(user);
 
-        User propertUser = userRepository.findById(user_id)
-                .orElse(null);
-
-        if(propertUser != null){
-            if (propertUser.getRole() == Role.VIP || (propertUser.getRole() == Role.USER && propertUser.getProperty_count() < 5)){
-                LocalDate date = LocalDate.now();
-                LocalDate expirationDate = date.plusDays(7);
-                var property = Property.builder()
-                        .is_active(true)
-                        .price(request.getPrice())
-                        .address(request.getAddress())
-                        .added_date(date)
-                        .expirationDate(expirationDate)
-                        .buildingType(request.getBuilding_type())
-                        .floor_number(request.getFloor_number())
-                        .total_floors(request.getTotal_floors())
-                        .room_count(request.getRoom_count())
-                        .area(request.getArea())
-                        .sale_type(request.getSale_type())
-                        .construction_year(request.getConstruction_year())
-                        .image(request.getImage())
-                        .user(propertUser)
-                        .build();
-
-                propertyRepository.save(property);
-
-                propertUser.setProperty_count(propertUser.getProperty_count() + 1);
-                userRepository.save(propertUser);
-
-                return "Property added successfully";
-            }
-            else{
-                return "You are only allowed to add 5 property. You need a VIP account to do this if you want proceed";
-            }
-        }
-        return "User not found!";
+        return property;
     }
 
     @Override
@@ -92,9 +76,15 @@ public class PropertyImpl implements PropertyService {
         Property property = propertyRepository.findByPropertyId(property_id)
                 .orElse(null);
 
-        if(property != null && property.is_active()){
-            modelMapper.map(request, property);
+        if(property != null){
+            LocalDate newDate = LocalDate.now();
+            LocalDate newExpirationDate = newDate.plusDays(7);
 
+            request.setAdded_date(newDate);
+            request.setExpiration_date(newExpirationDate);
+            request.set_active(true);
+
+            modelMapper.map(request, property);
             return propertyRepository.save(property);
         }
         return null;

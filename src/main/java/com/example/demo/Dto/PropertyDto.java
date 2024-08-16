@@ -5,7 +5,6 @@ import com.example.demo.Entity.SaleType;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Builder
@@ -24,4 +23,7 @@ public class PropertyDto {
     private String image;
     private int construction_year;
     private int area;
+    private LocalDate expiration_date;
+    private LocalDate added_date;
+    private boolean is_active;
 }

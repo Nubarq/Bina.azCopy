@@ -25,4 +25,5 @@ public interface UserService {
     void sendEmail(User user, String subject, String text) throws MessagingException;
 
     void passwordChange(RegisterRequestDto request, int n) throws MessagingException;
+
 }

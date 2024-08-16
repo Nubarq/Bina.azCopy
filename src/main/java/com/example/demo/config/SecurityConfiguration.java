@@ -36,6 +36,7 @@ public class SecurityConfiguration {
             "/data/**",
             "/login.html",
             "/register.html",
+            "/main.html",
             "/css/**"
     );
 

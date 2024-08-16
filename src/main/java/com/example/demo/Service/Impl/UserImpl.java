@@ -14,7 +14,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -145,6 +144,7 @@ public class UserImpl implements UserService {
         sendEmail(savedUser, subject, text);
     }
 
+
     @Override
     public User login(AuthenticationRequestDto request) {
         authenticationManager.authenticate(
@@ -186,7 +186,7 @@ public class UserImpl implements UserService {
 
     @Override
     public void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUser_id());
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUserId());
         if(validUserTokens.isEmpty()){
             return;
         }
