@@ -2,10 +2,10 @@ package com.example.demo.Service.Impl;
 
 import com.example.demo.Dto.PropertyDto;
 import com.example.demo.Entity.Property;
-import com.example.demo.Entity.Role;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.PropertyRepository;
 import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.JWTService;
 import com.example.demo.Service.PropertyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.View;
-
 import java.time.LocalDate;
 
 @Service
@@ -26,12 +24,18 @@ public class PropertyImpl implements PropertyService {
 
     PropertyRepository propertyRepository;
     UserRepository userRepository;
+    JWTService jwtService;
     ModelMapper modelMapper;
 
     @Override
-    public Property addProperty(PropertyDto request, User user) {
+    public Property addProperty(PropertyDto request, String token) {
         LocalDate date = LocalDate.now();
         LocalDate expirationDate = date.plusDays(7);
+
+        String email = jwtService.extractUserEmail(token);
+        var user = userRepository.findByEmail(email)
+                .orElseThrow();
+
         var property = Property.builder()
                 .is_active(true)
                 .price(request.getPrice())
@@ -51,7 +55,6 @@ public class PropertyImpl implements PropertyService {
         propertyRepository.save(property);
         user.setProperty_count(user.getProperty_count() + 1);
         userRepository.save(user);
-
         return property;
     }
 
@@ -73,19 +76,23 @@ public class PropertyImpl implements PropertyService {
 
     @Override
     public Property updateProperty(int property_id, PropertyDto request) {
-        Property property = propertyRepository.findByPropertyId(property_id)
-                .orElse(null);
+        Property existingProperty = propertyRepository.findById(property_id)
+                .orElseThrow(null);
 
-        if(property != null){
+
+
+        if(existingProperty != null){
+            // Map non-null fields from PropertyDto to existing Property
+            modelMapper.map(request, existingProperty);
+
             LocalDate newDate = LocalDate.now();
             LocalDate newExpirationDate = newDate.plusDays(7);
 
-            request.setAdded_date(newDate);
-            request.setExpiration_date(newExpirationDate);
-            request.set_active(true);
+            existingProperty.setAdded_date(newDate);
+            existingProperty.setExpirationDate(newExpirationDate);
+            existingProperty.set_active(true);
 
-            modelMapper.map(request, property);
-            return propertyRepository.save(property);
+            return propertyRepository.save(existingProperty);
         }
         return null;
     }

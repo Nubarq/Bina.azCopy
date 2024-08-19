@@ -1,11 +1,10 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Dto.AuthenticationRequestDto;
-import com.example.demo.Dto.AuthenticationResponseDto;
-import com.example.demo.Dto.RegisterRequestDto;
-import com.example.demo.Dto.RequestVIPDto;
+import com.example.demo.Component.JwtAuthenticationFilter;
+import com.example.demo.Dto.*;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.JWTService;
 import com.example.demo.Service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
@@ -23,6 +22,8 @@ public class UserController {
 
     UserService userService;
     UserRepository userRepository;
+    JWTService jwtService;
+
 
     @GetMapping("/verification")
     public ResponseEntity<String> verifyUser(@RequestParam("token") String token) {
@@ -65,8 +66,29 @@ public class UserController {
     }
 
     @PostMapping("/password/change")
-    public String passwordChange(@RequestBody RegisterRequestDto request) throws MessagingException {
-        userService.passwordChange(request, 6);
+    public String passwordChange(@RequestHeader("Authorization") String token) throws MessagingException {
+        token = token.replace("Bearer ", "");
+        userService.passwordChange(6, token);
         return "Password changed. Check your email!";
+    }
+
+    @PutMapping("/vip/touser")
+    public ResponseEntity<String> VIPtoUser(@RequestHeader("Authorization") String token){
+        token = token.replace("Bearer ", "");
+        String email = jwtService.extractUserEmail(token);
+        var user = userRepository.findByEmail(email)
+                .orElseThrow();
+        String message = userService.VIPtoUser(user);
+        return ResponseEntity.ok(message);
+    }
+
+    @PutMapping("/user/tovip")
+    public ResponseEntity<String> userToVIP(@RequestHeader("Authorization") String token, @RequestBody CardDto request){
+        token = token.replace("Bearer ", "");
+        String email = jwtService.extractUserEmail(token);
+        var user = userRepository.findByEmail(email)
+                .orElseThrow();
+        String message = userService.usertoVIP(user,request);
+        return ResponseEntity.ok(message);
     }
 }

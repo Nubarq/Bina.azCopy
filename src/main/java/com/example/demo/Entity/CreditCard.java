@@ -26,7 +26,7 @@ public class CreditCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expirationDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;

@@ -5,6 +5,7 @@ import com.example.demo.Entity.Property;
 import com.example.demo.Entity.Role;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.JWTService;
 import com.example.demo.Service.PropertyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +21,19 @@ public class PropertyController {
 
     PropertyService propertyService;
     UserRepository userRepository;
+    JWTService jwtService;
 
-    @PostMapping("/{user_id}/add/properties")
-    public ResponseEntity<String> addProperty(@PathVariable("user_id") int user_id, @RequestBody PropertyDto request){
-        User user = userRepository.findById(user_id)
-                .orElse(null);
+    @PostMapping("/add/properties")
+    public ResponseEntity<String> addProperty(@RequestHeader("Authorization") String token, @RequestBody PropertyDto request){
+        token = token.replace("Bearer ", "");
+        String email = jwtService.extractUserEmail(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         if(user != null) {
             if (user.getRole() == Role.VIP || (user.getRole() == Role.USER && user.getProperty_count() < 5)) {
-                Property property = propertyService.addProperty(request, user);
-                return ResponseEntity.ok("Property added successfully with the ID: {} " + property.getPropertyId());
+                Property property = propertyService.addProperty(request, token);
+                return ResponseEntity.ok("Property added successfully with the ID: " + property.getPropertyId());
             }
             else{
                 return ResponseEntity.badRequest().body("You are only allowed to add 5 property. You need a VIP account to do this if you want proceed");
@@ -38,10 +43,10 @@ public class PropertyController {
     }
 
     @DeleteMapping("/delete/properties/{property_id}")
-    public ResponseEntity<String> deleteProperty(@PathVariable("property_id") int property_id, @PathVariable("user_id") int user_id){
+    public ResponseEntity<String> deleteProperty(@PathVariable("property_id") int property_id){
         propertyService.deleteProperty(property_id);
 
-        return ResponseEntity.ok("Propert with the ID: {} was deleted." + property_id);
+        return ResponseEntity.ok("Propert with the ID: " + property_id + " was deleted.");
     }
 
     @PostMapping("/update/properties/{property_id}")
@@ -52,13 +57,13 @@ public class PropertyController {
 
         var property = propertyService.updateProperty(property_id, request);
         User user= property.getUser();
-        if(property != null && user.getProperty_count() <= 5){
-            return ResponseEntity.ok("Propert with the ID: {} was updated." + property_id );
+        if(property != null && (user.getRole()==Role.VIP || user.getProperty_count() <= 5)){
+            return ResponseEntity.ok("Propert with the ID: "  + property_id  +" was updated.");
         }
-        else if(user.getProperty_count() > 5){
+        else if(user.getRole() == Role.USER && user.getProperty_count() > 5){
             return ResponseEntity.badRequest().body("You are only allowed to add 5 property. You need a VIP account to do this if you want proceed");
         }
-        return ResponseEntity.badRequest().body("Propert with the ID: {} was not found" + property_id);
+        return ResponseEntity.badRequest().body("Propert with the ID: " + property_id +" was not found");
 
     }
 

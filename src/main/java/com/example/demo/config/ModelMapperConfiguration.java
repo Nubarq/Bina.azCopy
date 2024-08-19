@@ -12,8 +12,7 @@ public class ModelMapperConfiguration {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT)
-                .setSkipNullEnabled(true);
+                .setPropertyCondition(ctx -> ctx.getSource() != null);// Map only non-null properties
         return modelMapper;
     }
 }

@@ -2,7 +2,10 @@ package com.example.demo.Service.Impl;
 
 import com.example.demo.Dto.CardDto;
 import com.example.demo.Entity.CreditCard;
+import com.example.demo.Entity.Role;
+import com.example.demo.Entity.User;
 import com.example.demo.Repository.CardRepository;
+import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.CardService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +20,13 @@ import org.springframework.stereotype.Service;
 public class CardImpl implements CardService {
 
     CardRepository cardRepository;
+    UserRepository userRepository;
 
     @Override
-    public CreditCard updateCard(CardDto request, int user_id) {
-        CreditCard card = cardRepository.findByUser_UserId(user_id)
-                .orElse(null);
+    public CreditCard updateCard(CardDto request, User user) {
+        CreditCard card = user.getCard();
 
         if(card != null) {
-            System.out.println(request.getExpirationDate());
             card.setCardNumber(request.getCard_number());
             card.setExpirationDate(request.getExpirationDate());
             card.setActive(true);
@@ -32,4 +34,6 @@ public class CardImpl implements CardService {
         }
         return null;
     }
+
+
 }

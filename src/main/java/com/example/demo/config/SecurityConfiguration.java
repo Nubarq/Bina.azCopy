@@ -30,8 +30,11 @@ public class SecurityConfiguration {
     LogoutHandler logoutHandler;
 
     private static final List<String> PERMITTED_PATHS = Arrays.asList(
-            "/api/auth/**",
-            "/property/**",
+            "/api/auth/login",
+            "/api/auth/register/**",
+            "/api/auth/verification/**",
+            "api/auth/properties",
+            //"/property/**",
             "/main/**",
             "/data/**",
             "/login.html",

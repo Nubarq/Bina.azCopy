@@ -13,16 +13,16 @@ import java.time.LocalDate;
 public class PropertyDto {
 
     private long property_id;
-    private double price;
+    private Double price;
     private String address;
     private SaleType sale_type;
     private BuildingType building_type;
-    private int room_count;
-    private int floor_number;
-    private int total_floors;
+    private Integer room_count;
+    private Integer floor_number;
+    private Integer total_floors;
     private String image;
-    private int construction_year;
-    private int area;
+    private Integer construction_year;
+    private Integer area;
     private LocalDate expiration_date;
     private LocalDate added_date;
     private boolean is_active;

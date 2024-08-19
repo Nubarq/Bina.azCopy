@@ -1,9 +1,6 @@
 package com.example.demo.Service;
 
-import com.example.demo.Dto.AuthenticationRequestDto;
-import com.example.demo.Dto.AuthenticationResponseDto;
-import com.example.demo.Dto.RegisterRequestDto;
-import com.example.demo.Dto.RequestVIPDto;
+import com.example.demo.Dto.*;
 import com.example.demo.Entity.CreditCard;
 import com.example.demo.Entity.User;
 import jakarta.mail.MessagingException;
@@ -24,6 +21,9 @@ public interface UserService {
 
     void sendEmail(User user, String subject, String text) throws MessagingException;
 
-    void passwordChange(RegisterRequestDto request, int n) throws MessagingException;
+    void passwordChange(int n, String token) throws MessagingException;
 
+    String VIPtoUser(User user);
+
+    String usertoVIP(User user, CardDto request);
 }

@@ -1,9 +1,6 @@
 package com.example.demo.Service.Impl;
 
-import com.example.demo.Dto.AuthenticationRequestDto;
-import com.example.demo.Dto.AuthenticationResponseDto;
-import com.example.demo.Dto.RegisterRequestDto;
-import com.example.demo.Dto.RequestVIPDto;
+import com.example.demo.Dto.*;
 import com.example.demo.Entity.*;
 import com.example.demo.Repository.CardRepository;
 import com.example.demo.Repository.TokenRepository;
@@ -90,6 +87,8 @@ public class UserImpl implements UserService {
                 .user(savedUser)
                 .isActive(true)
                 .build();
+        savedUser.setCard(creditCard);
+        savedUser = userRepository.save(savedUser);
         if(creditCard.checkCardIsActive()){
             cardRepository.save(creditCard);
 
@@ -113,7 +112,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public void passwordChange(RegisterRequestDto request, int n) throws MessagingException {
+    public void passwordChange(int n, String token) throws MessagingException {
 
         String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         + "0123456789"
@@ -135,7 +134,8 @@ public class UserImpl implements UserService {
 
         String encodedPassword = passwordEncoder.encode(s.toString());
 
-        var user = userRepository.findByEmail(request.getEmail())
+        String email = jwtService.extractUserEmail(token);
+        var user = userRepository.findByEmail(email)
                 .orElseThrow();
 
         user.setPassword(encodedPassword);
@@ -208,5 +208,45 @@ public class UserImpl implements UserService {
                 .revoked(0)
                 .build();
         tokenRepository.save(token);
+    }
+
+    @Override
+    public String VIPtoUser(User user) {
+        CreditCard card = user.getCard();
+        int user_id = user.getUserId();
+
+        if(card != null && user != null){
+            user.setRole(Role.USER);
+            card.setActive(false);
+
+            cardRepository.save(card);
+            userRepository.save(user);
+
+
+            return "User with ID: " + user_id +" ended the VIP subscription";
+        }
+        return "User with ID: " + user_id + " was not found";
+    }
+
+    @Override
+    public String usertoVIP(User user, CardDto request) {
+        int user_id = user.getUserId();
+
+        if(user != null) {
+            CreditCard card = new CreditCard();
+
+            card.setCardNumber(request.getCard_number());
+            card.setExpirationDate(request.getExpirationDate());
+            card.setActive(true);
+
+            user.setRole(Role.VIP);
+            user.setCard(card);
+            card.setUser(user);
+            cardRepository.save(card);
+            userRepository.save(user);
+            return "User with ID: " + user_id +" just became VIP";
+        }
+
+        return "User with ID: " + user_id + " was not found";
     }
 }

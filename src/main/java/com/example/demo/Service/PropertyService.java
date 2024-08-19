@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 
 public interface PropertyService {
 
-    Property addProperty(PropertyDto request, User user);
+    Property addProperty(PropertyDto request, String token);
 
     void deleteProperty(int property_id);
 
