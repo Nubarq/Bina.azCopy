@@ -112,7 +112,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public void passwordChange(int n, String token) throws MessagingException {
+    public void forgotPassword(int n, AuthenticationRequestDto request) throws MessagingException {
 
         String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         + "0123456789"
@@ -134,7 +134,7 @@ public class UserImpl implements UserService {
 
         String encodedPassword = passwordEncoder.encode(s.toString());
 
-        String email = jwtService.extractUserEmail(token);
+        String email = request.getEmail();
         var user = userRepository.findByEmail(email)
                 .orElseThrow();
 

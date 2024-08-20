@@ -21,7 +21,7 @@ public interface UserService {
 
     void sendEmail(User user, String subject, String text) throws MessagingException;
 
-    void passwordChange(int n, String token) throws MessagingException;
+    void forgotPassword(int n, AuthenticationRequestDto request) throws MessagingException;
 
     String VIPtoUser(User user);
 

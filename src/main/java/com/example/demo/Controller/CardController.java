@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/card")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CardController {
     CardService cardService;
     UserRepository userRepository;
     JWTService jwtService;
 
-    @PostMapping("/card/update")
+    @PostMapping("/update")
     public ResponseEntity<CreditCard> updateCard(@RequestBody CardDto request, @RequestHeader("Authorization") String token) {
         token = token.replace("Bearer ", "");
         String email = jwtService.extractUserEmail(token);

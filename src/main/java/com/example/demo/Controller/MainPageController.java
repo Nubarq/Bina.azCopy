@@ -15,12 +15,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/properties")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MainPageController {
     PropertyService propertyService;
 
-    @GetMapping("/properties")
+    @GetMapping("/")
     public List<Property> getProperties( @RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size) {
         return propertyService.getProperties(page, size).getContent();

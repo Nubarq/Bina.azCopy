@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping()
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserController {
 
@@ -25,7 +25,7 @@ public class UserController {
     JWTService jwtService;
 
 
-    @GetMapping("/verification")
+    @GetMapping("/api/auth/verification")
     public ResponseEntity<String> verifyUser(@RequestParam("token") String token) {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
@@ -40,7 +40,7 @@ public class UserController {
         return ResponseEntity.ok("User verified successfully!");
     }
 
-    @PostMapping("/register/vip")
+    @PostMapping("/api/auth/register/vip")
     public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) throws MessagingException {
         User user = userService.registerVIP(request);
         if(user == null){
@@ -52,23 +52,22 @@ public class UserController {
         return ResponseEntity.ok(userService.createToken(user));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/api/auth/register")
     public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) throws MessagingException {
         User user = userService.register(request);
         return ResponseEntity.ok(userService.createToken(user));
 
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<AuthenticationResponseDto> login(@RequestBody AuthenticationRequestDto request) {
         User user = userService.login(request);
         return ResponseEntity.ok(userService.createToken(user));
     }
 
-    @PostMapping("/password/change")
-    public String passwordChange(@RequestHeader("Authorization") String token) throws MessagingException {
-        token = token.replace("Bearer ", "");
-        userService.passwordChange(6, token);
+    @PostMapping("api/auth/password/forgot")
+    public String passwordChange(@RequestBody AuthenticationRequestDto request) throws MessagingException {
+        userService.forgotPassword(6, request);
         return "Password changed. Check your email!";
     }
 
