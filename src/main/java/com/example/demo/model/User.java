@@ -55,6 +55,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Property> propertyList;
 
+    @Column(name = "property_count")
+    private int property_count;
     public User() {
         // Create a new Account with default values and set bidirectional relationship
         this.propertyList = new ArrayList<>(); // Initialize loans list in the constructor

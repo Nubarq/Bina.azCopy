@@ -15,11 +15,11 @@ public interface PropertyMapper {
     @Mapping(target="userId", source="user.id")
     PropertyResponseDto mapEntityToPropertyResponsetDto(Property property);
 
-    @Mapping(target="branch.id", source="branchId")
+//    @Mapping(target="user.id", source="userId")
     Property mapUpdatePropertyRequestDtoToEntity
     (UpdatePropertyRequestDto updateRequestDtorequestDto, @MappingTarget Property property);
 
-    @Mapping(target="branchId", source="branch.id")
+    @Mapping(target="userId", source="user.id")
     PropertyResponseDto mapEntityToUpdatePropertyResponseDto
             (Property property, @MappingTarget PropertyResponseDto responseDto);
 }

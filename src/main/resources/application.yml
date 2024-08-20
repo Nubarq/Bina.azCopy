@@ -17,12 +17,12 @@ spring:
 
 
   mail:
-#    host: sandbox.smtp.mailtrap.io
-#    username: "e1b7e006fa41ee"
-#    password: "7a9560a3f7ea2f"
-    host: smtp.outlook.com
-    username: "Arzuyaldiz47@outlook.com"
-    password: "6989Ay45"
+    host: sandbox.smtp.mailtrap.io
+    username: "e1b7e006fa41ee"
+    password: "7a9560a3f7ea2f"
+#    host: smtp.outlook.com
+#    username: "Arzuyaldiz47@outlook.com"
+#    password: "6989Ay45"
     port: 587
     properties:
       mail:

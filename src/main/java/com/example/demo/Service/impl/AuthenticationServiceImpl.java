@@ -54,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void sendEmail(String to, String subject, String message) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom("Arzuyaldiz47@outlook.com");
+        mimeMessageHelper.setFrom("BinaCopy@gmail.com");
         mimeMessageHelper.setTo(to);
         mimeMessageHelper.setSubject(subject);
         mimeMessageHelper.setText(message, true);
@@ -103,14 +103,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
-
     @Override
     public JwtAuthenticationResponse signupVIP(SignUpVIP signUpVIP) throws MessagingException {
         String token = UUID.randomUUID().toString();
-
+        System.out.println("Token: "+token);
 
         User user = new User();
         user.setEmail(signUpVIP.getEmail());
+        user.setVerificationToken(token);
         user.setRole(Role.USER);
         user.setUserType(UserType.VIP);
         user.setPassword(passwordEncoder.encode(signUpVIP.getPassword()));
@@ -142,6 +142,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             jwtAuthenticationResponse.setRefreshToken(refreshToken);
             return jwtAuthenticationResponse;
         }
+        System.out.println("card is NOT ACTIVE");
         return null;
     }
 

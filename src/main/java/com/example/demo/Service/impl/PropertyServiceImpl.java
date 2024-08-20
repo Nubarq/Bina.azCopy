@@ -19,6 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,13 +35,16 @@ public class PropertyServiceImpl implements PropertyService {
     private UserRepository userRepository;
     @Override
     public String createProperty(PropertyRequestDto requestDto) {
+
         User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new CustomException("not found "+requestDto.getUserId()+" property"));
-        if (user.getPropertyList().size()> 3){
+        if (user.getProperty_count()> 3){
             if(user.getUserType()== UserType.VIP){
                  Property property = propertyMapper.mapPropertyRequestDtoToEntity(requestDto);
                  property.setUser(user);
                  Property savedProperty = propertyRepository.save(property);
                   propertyMapper.mapEntityToPropertyResponsetDto(savedProperty);
+                  user.setProperty_count(user.getProperty_count()+1);
+                  userRepository.save(user);
                   return "Property is created succesfuly";
             }else {
                 return "You need to be VIP to create 4th property";
@@ -48,6 +54,8 @@ public class PropertyServiceImpl implements PropertyService {
             property.setUser(user);
             Property savedProperty = propertyRepository.save(property);
             propertyMapper.mapEntityToPropertyResponsetDto(savedProperty);
+            user.setProperty_count(user.getProperty_count()+1);
+            userRepository.save(user);
             return "Property is created succesfuly";
         }
     }
@@ -55,9 +63,11 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public String deleteProperty(Integer id) {
         Property property=propertyRepository.findById(id).orElseThrow(() -> new CustomException("not found "+id+" property"));
-
+        User user = property.getUser();
         if (property.checkPropertyIsActive()){
             property.setActive(false);
+            user.setProperty_count(user.getProperty_count()-1);
+            userRepository.save(user);
             return "This property is not active anymore";
         }else {
             return "This property is already deleted";
@@ -65,17 +75,37 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public PropertyResponseDto updateProperty(Integer id,UpdatePropertyRequestDto updateRequestDto) {
+    public String updateProperty(Integer id,UpdatePropertyRequestDto updateRequestDto) {
         Property property = propertyRepository.findById(id).orElseThrow(() -> new CustomException("not found "+id+" property"));
-        propertyMapper.mapUpdatePropertyRequestDtoToEntity(updateRequestDto,property);
-        Property saved = propertyRepository.save(property);
-
-        return propertyMapper.mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
+        User user = property.getUser();
+        if (user.getProperty_count()>3){
+            if(user.getUserType()== UserType.VIP){
+                property.setActive(true);
+                property.setCreatedAt(new Date());
+                propertyMapper.mapUpdatePropertyRequestDtoToEntity(updateRequestDto,property);
+                Property saved = propertyRepository.save(property);
+                user.setProperty_count(user.getProperty_count()+1);
+                userRepository.save(user);
+                PropertyResponseDto responseDto=propertyMapper.mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
+                return "Updated the property: " + id +" TO ->  " + responseDto;
+            }else {
+                return "the property: "+ id+" can not be updated as it is your 4th active property";
+            }
+        }else {
+            property.setActive(true);
+            property.setCreatedAt(new Date());
+            propertyMapper.mapUpdatePropertyRequestDtoToEntity(updateRequestDto,property);
+            Property saved = propertyRepository.save(property);
+            user.setProperty_count(user.getProperty_count()+1);
+            userRepository.save(user);
+            PropertyResponseDto responseDto=propertyMapper.mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
+            return "Updated the property: " + id +" TO ->  " + responseDto;
+        }
     }
 
     @Override
     public Page<Property> getProperties(int page, int size) {
-        int maxSize = 20;
+        int maxSize = 10;
         if(size > maxSize)
             size = maxSize;
         Pageable pageable = PageRequest.of(page, size);

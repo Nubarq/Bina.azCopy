@@ -10,7 +10,7 @@ public interface PropertyService {
     String createProperty(PropertyRequestDto requestDto);
     String deleteProperty(Integer id);
 
-    PropertyResponseDto updateProperty(Integer id, UpdatePropertyRequestDto updateRequestDto);
+    String updateProperty(Integer id, UpdatePropertyRequestDto updateRequestDto);
 
     Page<Property> getProperties(int page, int size);
 

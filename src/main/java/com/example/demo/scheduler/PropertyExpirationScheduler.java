@@ -1,8 +1,9 @@
 package com.example.demo.scheduler;
 
-import com.alas.lemlist.model.Video;
-import com.alas.lemlist.repository.VideoRepository;
+
+import com.example.demo.model.Card;
 import com.example.demo.model.Property;
+import com.example.demo.repository.CardRepository;
 import com.example.demo.repository.PropertyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +20,9 @@ import java.util.List;
 public class PropertyExpirationScheduler {
     @Autowired
     private PropertyRepository propertyRepository;
+    @Autowired
+    private CardRepository cardRepository;
 
-    private static final String folderLocation = "C:/lemlistVideo";
-
-//    @Scheduled(cron = "0 0 0 * * ?") // This will run once a day at midnight
-//    public void cleanUpOldVideos() throws InterruptedException {
-//        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(7);
-//        List<Video> oldVideos = videoRepository.findByCreatedAtBefore(thirtyDaysAgo);
-//
-//        for (Video video : oldVideos) {
-//            String fileName = video.getRandomName();
-//            File fileToDelete = new File(folderLocation + "/" + fileName);
-//
-//            if (fileToDelete.exists()) {
-//                fileToDelete.delete();
-//            }
-//
-//            videoRepository.delete(video);
-//        }
-//    }
 
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression runs the method at midnight every day
     public void deactivateExpiredProperties() {
@@ -48,4 +33,19 @@ public class PropertyExpirationScheduler {
             propertyRepository.save(property);
         }
     }
+
+    @Scheduled(cron = "0 * * * * ?") // This cron expression runs the method at midnight every day
+    public void deactivateExpiredCards() {
+        // Fetch all active cards with an expiration date before today
+        List<Card> expiredCards = cardRepository.findByIsActiveTrueAndExpirationDateBefore(new Date());
+
+        for (Card card : expiredCards) {
+            // Only set the card to inactive if it is currently active
+            if (card.isActive()) {
+                card.setActive(false);
+                cardRepository.save(card);
+            }
+        }
+    }
+
 }
