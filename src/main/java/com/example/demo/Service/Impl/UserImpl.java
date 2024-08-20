@@ -70,6 +70,36 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public User registerGuest(RegisterRequestDto request) throws MessagingException {
+        String token = UUID.randomUUID().toString();
+        var user = User.builder()
+                .user_name(request.getUser_name())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.GUEST)
+                .property_count(0)
+                .verificationToken(token)
+                .isVerified(false)
+                .build();
+        var savedUser = userRepository.save(user);
+
+        String link = "http://localhost:8085/api/auth/verification?token=" + token;
+        String verificationText = "<html>"
+                + "<body>"
+                + "<p>Thank you for visiting <strong>Bina.az</strong>, your trusted platform for property listings and real estate services.</p>"
+                + "<p>Please click the link below to verify your account:</p>"
+                + "<p><a href=\"" + link + "\">Verify your account</a></p>"
+                + "</body>"
+                + "</html>";
+
+        String subject = "Welcome to Bina.az!";
+
+        sendEmail(savedUser, subject, verificationText);
+
+        return savedUser;
+    }
+
+    @Override
     public User registerVIP(RequestVIPDto request) throws MessagingException {
         String token = UUID.randomUUID().toString();
         var user = User.builder()

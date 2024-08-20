@@ -9,6 +9,8 @@ public interface UserService {
 
     User register(RegisterRequestDto request) throws MessagingException;
 
+    User registerGuest(RegisterRequestDto request) throws MessagingException;
+
     User registerVIP(RequestVIPDto request) throws MessagingException;
 
     User login(AuthenticationRequestDto request);

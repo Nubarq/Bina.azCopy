@@ -15,4 +15,5 @@ public class AuthenticationResponseDto implements Serializable {
 
     private String token;
     private String error;
+    private String userError;
 }

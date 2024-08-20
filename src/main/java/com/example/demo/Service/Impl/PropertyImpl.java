@@ -79,8 +79,6 @@ public class PropertyImpl implements PropertyService {
         Property existingProperty = propertyRepository.findById(property_id)
                 .orElseThrow(null);
 
-
-
         if(existingProperty != null){
             // Map non-null fields from PropertyDto to existing Property
             modelMapper.map(request, existingProperty);

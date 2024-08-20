@@ -26,36 +26,43 @@ public class UserController {
 
 
     @GetMapping("/api/auth/verification")
-    public ResponseEntity<String> verifyUser(@RequestParam("token") String token) {
+    public ResponseEntity<AuthenticationResponseDto> verifyUser(@RequestParam("token") String token) {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
 
         if (user.isVerified()) {
-            return ResponseEntity.badRequest().body("User is already verified.");
+            var userError = AuthenticationResponseDto.builder()
+                    .userError("user already verified")
+                    .build();
+            return ResponseEntity.badRequest().body(userError);
         }
-
         user.setVerified(true);
         userRepository.save(user);
 
-        return ResponseEntity.ok("User verified successfully!");
+        return ResponseEntity.ok(userService.createToken(user));
     }
 
     @PostMapping("/api/auth/register/vip")
-    public ResponseEntity<AuthenticationResponseDto> registerVIP(@RequestBody RequestVIPDto request) throws MessagingException {
+    public ResponseEntity<String> registerVIP(@RequestBody RequestVIPDto request) throws MessagingException {
         User user = userService.registerVIP(request);
         if(user == null){
-            var error = AuthenticationResponseDto.builder()
-                    .error("Credit Card is not valid!")
-                    .build();
-            return ResponseEntity.badRequest().body(error);
+            return ResponseEntity.badRequest().body("Credit Card is not valid!");
         }
-        return ResponseEntity.ok(userService.createToken(user));
+        return ResponseEntity.ok("Please verify to continue. Verification link is sent to tour email. Your verification token is: " + user.getVerificationToken());
+    }
+
+
+    @PostMapping("/api/auth/register/guest")
+    public ResponseEntity<String> registerGuest(@RequestBody RegisterRequestDto request) throws MessagingException {
+        User user = userService.registerGuest(request);
+        return ResponseEntity.ok("Please verify to continue. Verification link is sent to tour email. Your verification token is: " + user.getVerificationToken());
+
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<AuthenticationResponseDto> register(@RequestBody RegisterRequestDto request) throws MessagingException {
+    public ResponseEntity<String> register(@RequestBody RegisterRequestDto request) throws MessagingException {
         User user = userService.register(request);
-        return ResponseEntity.ok(userService.createToken(user));
+        return ResponseEntity.ok("Please verify to continue. Verification link is sent to tour email. Your verification token is: " + user.getVerificationToken());
 
     }
 
