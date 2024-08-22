@@ -31,7 +31,6 @@ public class SecurityConfiguration {
 
     private static final List<String> PERMITTED_PATHS = Arrays.asList(
             "/api/auth/**",
-            "/properties",
             "/main/**",
             "/data/**",
             "/login.html",

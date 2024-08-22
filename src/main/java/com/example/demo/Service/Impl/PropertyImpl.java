@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
@@ -104,5 +105,18 @@ public class PropertyImpl implements PropertyService {
         return propertyRepository.findAll(pageable);
     }
 
+    @Override
+    public Page<Property> getPropertiesSorted(int page, int size, String field, String direction) {
+        int maxSize = 20;
+        if(size > maxSize)
+            size = maxSize;
+        Pageable pageable;
+        if(direction.equalsIgnoreCase("asc")){
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, field));
+            return propertyRepository.findAll(pageable);
+        }
+        pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, field));
+        return propertyRepository.findAll(pageable);
+    }
 
 }
