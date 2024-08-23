@@ -2,6 +2,7 @@ package com.example.demo.Service.impl;
 
 import com.example.demo.Exeption.CustomException;
 import com.example.demo.Service.PropertyService;
+import com.example.demo.Spesification.PropertySpecification;
 import com.example.demo.dto.property.PropertyRequestDto;
 import com.example.demo.dto.property.PropertyResponseDto;
 import com.example.demo.dto.property.UpdatePropertyRequestDto;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -36,7 +38,8 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public String createProperty(PropertyRequestDto requestDto) {
 
-        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> new CustomException("not found "+requestDto.getUserId()+" property"));
+        User user = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new CustomException("not found "+requestDto.getUserId()+" property"));
         if (user.getProperty_count()> 3){
             if(user.getUserType()== UserType.VIP){
                  Property property = propertyMapper.mapPropertyRequestDtoToEntity(requestDto);
@@ -62,7 +65,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public String deleteProperty(Integer id) {
-        Property property=propertyRepository.findById(id).orElseThrow(() -> new CustomException("not found "+id+" property"));
+        Property property=propertyRepository.findById(id)
+                .orElseThrow(() -> new CustomException("not found "+id+" property"));
         User user = property.getUser();
         if (property.checkPropertyIsActive()){
             property.setActive(false);
@@ -76,7 +80,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public String updateProperty(Integer id,UpdatePropertyRequestDto updateRequestDto) {
-        Property property = propertyRepository.findById(id).orElseThrow(() -> new CustomException("not found "+id+" property"));
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new CustomException("not found "+id+" property"));
         User user = property.getUser();
         if (user.getProperty_count()>3){
             if(user.getUserType()== UserType.VIP){
@@ -86,7 +91,8 @@ public class PropertyServiceImpl implements PropertyService {
                 Property saved = propertyRepository.save(property);
                 user.setProperty_count(user.getProperty_count()+1);
                 userRepository.save(user);
-                PropertyResponseDto responseDto=propertyMapper.mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
+                PropertyResponseDto responseDto=propertyMapper
+                        .mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
                 return "Updated the property: " + id +" TO ->  " + responseDto;
             }else {
                 return "the property: "+ id+" can not be updated as it is your 4th active property";
@@ -98,7 +104,8 @@ public class PropertyServiceImpl implements PropertyService {
             Property saved = propertyRepository.save(property);
             user.setProperty_count(user.getProperty_count()+1);
             userRepository.save(user);
-            PropertyResponseDto responseDto=propertyMapper.mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
+            PropertyResponseDto responseDto=propertyMapper
+                    .mapEntityToUpdatePropertyResponseDto(saved,new PropertyResponseDto());
             return "Updated the property: " + id +" TO ->  " + responseDto;
         }
     }
@@ -108,9 +115,33 @@ public class PropertyServiceImpl implements PropertyService {
         int maxSize = 10;
         if(size > maxSize)
             size = maxSize;
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = Sort.by(Sort.Direction.ASC, "price");
+//        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page,size,sort);
         return propertyRepository.findAll(pageable);
+
+    }
+
+    public Page<Property> getPropertiesByRoomCount(int roomCount, int page, int size) {
+        int maxSize = 10;
+        if (size > maxSize)
+            size = maxSize;
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findByRoomCount(roomCount, pageable);
+    }
+
+    public Page<Property> getPropertiesByPriceRange(double minPrice, double maxPrice, int page, int size) {
+        int maxSize = 10;
+        if (size > maxSize)
+            size = maxSize;
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findByPriceBetween(minPrice, maxPrice, pageable);
     }
 
 
-}
+    public List<Property> findProperties(Integer minPrice, Integer maxPrice, Integer minRooms) {
+        PropertySpecification spec = new PropertySpecification(minPrice, maxPrice, minRooms);
+        return propertyRepository.findAll(spec);
+    }
+
+    }
