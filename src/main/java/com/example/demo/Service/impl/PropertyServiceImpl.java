@@ -139,9 +139,15 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
 
-    public List<Property> findProperties(Integer minPrice, Integer maxPrice, Integer minRooms) {
+    public Page<Property> findProperties(Integer minPrice, Integer maxPrice, Integer minRooms, int page, int size) {
+        int maxSize = 10;
+        if (size > maxSize) {
+            size = maxSize;
+        }
+        Pageable pageable = PageRequest.of(page, size);
+
         PropertySpecification spec = new PropertySpecification(minPrice, maxPrice, minRooms);
-        return propertyRepository.findAll(spec);
+        return propertyRepository.findAll(spec, pageable);
     }
 
     }

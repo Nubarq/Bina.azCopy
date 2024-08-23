@@ -21,6 +21,6 @@ public interface PropertyService {
 
 //    List<Property> findActiveProperties();
 
-    List<Property> findProperties(Integer minPrice, Integer maxPrice, Integer minRooms);
+    Page<Property> findProperties(Integer minPrice, Integer maxPrice, Integer minRooms, int page, int size);
 
     }

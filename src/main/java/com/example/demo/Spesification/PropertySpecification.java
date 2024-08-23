@@ -43,7 +43,7 @@ public class PropertySpecification implements Specification<Property> {
         }
 
         if (minRooms != null) {
-            predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("roomCount"), minRooms));
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("roomCount"), minRooms));
         }
 
         return predicate;

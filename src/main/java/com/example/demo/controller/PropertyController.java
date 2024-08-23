@@ -57,11 +57,13 @@ public class PropertyController {
 //    }
 
     @GetMapping("/properties")
-    public List<Property> getProperties(
+    public Page<Property> getProperties(
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
-            @RequestParam(required = false) Integer minRooms) {
-        return propertyService.findProperties(minPrice, maxPrice, minRooms);
+            @RequestParam(required = false) Integer minRooms,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return propertyService.findProperties(minPrice, maxPrice, minRooms, page, size);
     }
 
     }
