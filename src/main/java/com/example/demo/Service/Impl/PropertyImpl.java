@@ -1,22 +1,25 @@
 package com.example.demo.Service.Impl;
 
 import com.example.demo.Dto.PropertyDto;
+import com.example.demo.Dto.SortingDto;
 import com.example.demo.Entity.Property;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.PropertyRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.JWTService;
 import com.example.demo.Service.PropertyService;
+import com.example.demo.Specification.PropertySpecification;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -41,15 +44,15 @@ public class PropertyImpl implements PropertyService {
                 .is_active(true)
                 .price(request.getPrice())
                 .address(request.getAddress())
-                .added_date(date)
+                .addedDate(date)
                 .expirationDate(expirationDate)
                 .buildingType(request.getBuilding_type())
-                .floor_number(request.getFloor_number())
-                .total_floors(request.getTotal_floors())
-                .room_count(request.getRoom_count())
+                .floorNumber(request.getFloor_number())
+                .totalFloors(request.getTotal_floors())
+                .roomCount(request.getRoom_count())
                 .area(request.getArea())
-                .sale_type(request.getSale_type())
-                .construction_year(request.getConstruction_year())
+                .saleType(request.getSale_type())
+                .constructionYear(request.getConstruction_year())
                 .image(request.getImage())
                 .user(user)
                 .build();
@@ -87,7 +90,7 @@ public class PropertyImpl implements PropertyService {
             LocalDate newDate = LocalDate.now();
             LocalDate newExpirationDate = newDate.plusDays(7);
 
-            existingProperty.setAdded_date(newDate);
+            existingProperty.setAddedDate(newDate);
             existingProperty.setExpirationDate(newExpirationDate);
             existingProperty.set_active(true);
 
@@ -96,6 +99,7 @@ public class PropertyImpl implements PropertyService {
         return null;
     }
 
+    /*
     @Override
     public Page<Property> getProperties(int page, int size) {
         int maxSize = 20;
@@ -104,7 +108,7 @@ public class PropertyImpl implements PropertyService {
         Pageable pageable = PageRequest.of(page, size);
         return propertyRepository.findAll(pageable);
     }
-
+     */
     @Override
     public Page<Property> getPropertiesSorted(int page, int size, String field, String direction) {
         int maxSize = 20;
@@ -118,5 +122,61 @@ public class PropertyImpl implements PropertyService {
         pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, field));
         return propertyRepository.findAll(pageable);
     }
+
+    @Override
+    public Page<Property> getPropertiesSpecifSorted(int page, int size, SortingDto request){
+        Pageable pageable =PageRequest.of(page, size);
+        PropertySpecification specification = new PropertySpecification(request);
+        return propertyRepository.findAll(specification, pageable);
+    }
+
+
+/*
+    @Override
+    public Page<Property> getPropertiesRoomCount(int page, int size, int room_count){
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findByRoomCount(room_count, pageable);
+    }
+
+    @Override
+    public Page<Property> getPropertiesFloorNumber(int page, int size, int floor_number){
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findByFloorNumber(floor_number, pageable);
+    }
+
+    @Override
+    public Page<Property> getPropertiesConstructionYear(int page, int size, int construction_year){
+        Pageable pageable = PageRequest.of(page, size);
+        return propertyRepository.findByConstructionYear(construction_year, pageable);
+    }
+
+    @Override
+    public Page<Property> getPropertiesPriceRange(int page, int size, int lower_price, int upper_price, String direction){
+        Pageable pageable;
+        if(direction.equalsIgnoreCase("asc")){
+            Sort sort = Sort.by(Sort.Direction.ASC, "price");
+            pageable = PageRequest.of(page, size, sort);
+            return propertyRepository.findByPriceBetween(lower_price, upper_price, pageable);
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "price");
+        pageable = PageRequest.of(page, size, sort);
+        return propertyRepository.findByPriceBetween(lower_price, upper_price, pageable);
+    }
+
+    @Override
+    public Page<Property> getPropertiesArea(int page, int size, int lower_area, int higher_area,String direction){
+
+        Pageable pageable;
+        if(direction.equalsIgnoreCase("asc")){
+            Sort sort = Sort.by(Sort.Direction.ASC, "area");
+            pageable = PageRequest.of(page, size, sort);
+            return propertyRepository.findByAreaBetween(lower_area, higher_area, pageable);
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "area");
+        pageable = PageRequest.of(page, size, sort);
+        return propertyRepository.findByAreaBetween(lower_area, higher_area, pageable);
+    }
+
+ */
 
 }

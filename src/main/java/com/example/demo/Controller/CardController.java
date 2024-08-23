@@ -21,7 +21,7 @@ public class CardController {
     UserRepository userRepository;
     JWTService jwtService;
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<CreditCard> updateCard(@RequestBody CardDto request, @RequestHeader("Authorization") String token) {
         token = token.replace("Bearer ", "");
         String email = jwtService.extractUserEmail(token);

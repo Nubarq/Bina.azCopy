@@ -29,13 +29,66 @@ public class MainPageController {
     */
 
     @GetMapping("")
-    public List<Property> getProperties( @RequestParam(value = "page", defaultValue = "0") int page,
+    public List<Property> getProperties(@RequestParam(value = "page", defaultValue = "0") int page,
                                          @RequestParam(value = "size", defaultValue = "10") int size,
-                                         @RequestBody SortingDto request ){
-                                         //@PathVariable("field") String field,
-                                         //@RequestParam(value = "direction", defaultValue = "asc") String direction) {
+                                         @RequestBody SortingDto request){
         String field = request.getField();
         String direction = request.getDirection();
         return propertyService.getPropertiesSorted(page, size, field, direction).getContent();
     }
+    /*
+
+    @GetMapping("/roomcount")
+    public List<Property> getPropertiesRoomCount (@RequestParam(value = "page", defaultValue = "0") int page,
+                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                  @RequestBody SortingDto request){
+        int roomCount = request.getRoomCount();
+        return propertyService.getPropertiesRoomCount(page, size, roomCount).getContent();
+    }
+
+    @GetMapping("/floornumber")
+    public List<Property> getPropertiesFloorNumber (@RequestParam(value = "page", defaultValue = "0") int page,
+                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                  @RequestBody SortingDto request){
+        int floorNumber = request.getFloorNumber();
+        return propertyService.getPropertiesFloorNumber(page, size, floorNumber).getContent();
+    }
+
+    @GetMapping("/constructionyear")
+    public List<Property> getPropertiesConstrucYear (@RequestParam(value = "page", defaultValue = "0") int page,
+                                                  @RequestParam(value = "size", defaultValue = "10") int size,
+                                                  @RequestBody SortingDto request){
+        int constructionYear = request.getConstructionYear();
+        return propertyService.getPropertiesConstructionYear(page, size, constructionYear).getContent();
+    }
+
+    @GetMapping("/price")
+    public List<Property> getPropertiesPriceRange (@RequestParam(value = "page", defaultValue = "0") int page,
+                                                     @RequestParam(value = "size", defaultValue = "10") int size,
+                                                     @RequestBody SortingDto request){
+        int lower_price = request.getLower_price();
+        int upper_price = request.getUpper_price();
+        String direction = request.getDirection();
+        return propertyService.getPropertiesPriceRange(page, size, lower_price, upper_price, direction).getContent();
+    }
+
+    @GetMapping("/area")
+    public List<Property> getPropertiesArea (@RequestParam(value = "page", defaultValue = "0") int page,
+                                                   @RequestParam(value = "size", defaultValue = "10") int size,
+                                                   @RequestBody SortingDto request){
+        int lower_area = request.getLower_area();
+        int higher_area = request.getHigher_area();
+        String direction = request.getDirection();
+        return propertyService.getPropertiesArea(page, size, lower_area, higher_area, direction).getContent();
+    }
+     */
+
+    @GetMapping("/sorted")
+    public List<Property> getPropertiesSorted(@RequestParam(value = "page", defaultValue = "0") int page,
+                                              @RequestParam(value = "size", defaultValue = "10") int size,
+                                              @RequestBody SortingDto request){
+
+       return propertyService.getPropertiesSpecifSorted(page, size, request).getContent();
+    }
+
 }

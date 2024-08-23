@@ -1,8 +1,6 @@
 package com.example.demo.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,31 +26,31 @@ public class Property {
     private String address;
 
     @Enumerated(EnumType.STRING)
-    private SaleType sale_type;
+    private SaleType saleType;
 
     @Enumerated(EnumType.STRING)
     private BuildingType buildingType;
 
     @Column(name = "room_count")
-    private int room_count;
+    private int roomCount;
 
     @Column(name = "image")
     private String image;
 
     @Column(name = "floor_number")
-    private int floor_number;
+    private int floorNumber;
 
     @Column(name = "total_floors")
-    private int total_floors;
+    private int totalFloors;
 
     @Column(name = "added_date")
-    private LocalDate added_date;
+    private LocalDate addedDate;
 
     @Column(name = "expiration_date")
     private LocalDate expirationDate;
 
     @Column(name = "construction_year")
-    private int construction_year;
+    private int constructionYear;
 
     @Column(name = "area")
     private int area;
