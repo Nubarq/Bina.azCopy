@@ -37,7 +37,7 @@ public class PropertyController {
     }
 
     @GetMapping("/getProperties/ByRoomCount")
-    public Page<Property> getPropertiesByRoomCount(@RequestParam int roomCount,
+    public Page<Prq11```operty> getPropertiesByRoomCount(@RequestParam int roomCount,
                                                    @RequestParam int page,
                                                    @RequestParam int size) {
         return propertyService.getPropertiesByRoomCount(roomCount,page,size);
