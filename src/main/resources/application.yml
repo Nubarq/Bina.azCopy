@@ -4,16 +4,16 @@ logging:
 
 spring:
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:8895/binaDb
-    username: bina
-    password: bina
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-    database: mysql
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:8895/binaDb
+#    username: bina
+#    password: bina
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#    database: mysql
 
 
   mail:
