@@ -1,0 +1,44 @@
+logging:
+  level:
+    root: info
+
+spring:
+
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:8895/binaDb
+#    username: bina
+#    password: bina
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#    database: mysql
+
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    username: "e1b7e006fa41ee"
+    password: "7a9560a3f7ea2f"
+#    host: smtp.outlook.com
+#    username: "Arzuyaldiz47@outlook.com"
+#    password: "6989Ay45"
+    port: 587
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
+
+
+
+
+url:
+  ignore:
+    swagger: /v2/api-docs, /webjars/*, /swagger-resources/, /actuator/health, /swagger-ui/index.html, /swagger-ui.html, /app//.{js,html}
+
+springdoc:
+  swagger-ui:
+    path: /swagger
